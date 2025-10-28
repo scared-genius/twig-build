@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./public/css/index.css">
+</head>
+<body class="min-h-screen flex flex-col bg-gray-50 text-gray-900">
+  <header class="bg-white shadow-sm ">
+  <div class="px-6 py-4 flex items-center justify-between max-w-[1440px] mx-auto">
+    <div class="flex items-center gap-4">
+      <a href="./index.html" class="text-xl font-semibold">TicketApp</a>
+    </div>
+    <nav class="flex items-center gap-4 text-sm">
+      <a href="./dashboard.html" class="nav-dashboard hidden">Dashboard</a>
+      <a href="./tickets.html" class="nav-tickets hidden">Tickets</a>
+      <a href="./login.html" class="nav-login">Login</a>
+      <a href="./signup.html" class="nav-signup px-4 py-1 bg-indigo-600 text-white rounded-md">Get Started</a>
+      <button id="nav-logout" class="nav-logout hidden text-sm px-3 py-1 rounded-md bg-red-50 text-red-600">Logout</button>
+    </nav>
+  </div>
+  <script type="module">
+    import { getSession, logout } from './public/js/authService.js';
+    const session = getSession();
+    const show = (sel)=> document.querySelectorAll(sel).forEach(e=>e.classList.remove('hidden'));
+    const hide = (sel)=> document.querySelectorAll(sel).forEach(e=>e.classList.add('hidden'));
+    if(session){
+      show('.nav-dashboard'); show('.nav-tickets');
+      hide('.nav-login'); hide('.nav-signup');
+      document.getElementById('nav-logout').classList.remove('hidden');
+      document.getElementById('nav-logout').addEventListener('click', ()=>{ logout(); });
+    } else {
+      hide('.nav-dashboard'); hide('.nav-tickets'); hide('.nav-logout');
+      show('.nav-login'); show('.nav-signup');
+    }
+  </script>
+</header>  <div id="toast-root" class="fixed top-4 right-4 z-50 space-y-2">
+  </div>
+  <main class="max-w-[1440px] mx-auto w-[90%] md:w-4/5 py-12 px-6">
+  <img src="./public/assets/success.png" class="hidden text-green-500 bg-white"/>
+
+  <section class="flex items-center justify-between mb-6">
+    <h2 class="text-2xl font-semibold">Dashboard</h2>
+    <button onclick="window.location.href='/tickets.html'" class="px-4 py-2 bg-indigo-600 text-white rounded">Manage Tickets</button>
+  </section>
+  <section class="grid md:grid-cols-3 gap-6 mb-6">
+    <div class="bg-white p-6 rounded-2xl shadow">
+      <h3 class="text-sm text-gray-500">Total tickets</h3>
+      <p id="stat-total" class="text-3xl font-semibold mt-2">0</p>
+    </div>
+    <div class="bg-white p-6 rounded-2xl shadow">
+      <h3 class="text-sm text-gray-500">Open tickets</h3>
+      <p id="stat-open" class="text-3xl font-semibold mt-2">0<p>
+    </div>
+    <div class="bg-white p-6 rounded-2xl shadow">
+      <h3 class="text-sm text-gray-500">Resolved tickets</h3>
+      <p id="stat-closed" class="text-3xl font-semibold mt-2">0</p>
+    </div>
+  </section>
+ 
+</main>
+<script type="module">
+import { getSession } from './public/js/authService.js';
+import { fetchTickets } from './public/js/ticketService.js';
+import { showToast } from './public/js/toast.js';
+if(!getSession()){ window.location.href = '/login.html'; }
+async function load(){ try{ const tickets = await fetchTickets(); document.getElementById('stat-total').textContent = tickets.length; document.getElementById('stat-open').textContent = tickets.filter(t=>t.status==='open').length; document.getElementById('stat-closed').textContent = tickets.filter(t=>t.status==='closed').length; const grid=document.getElementById('tickets-grid'); grid.innerHTML=''; tickets.forEach(t=>{ const card=document.createElement('article'); card.className='bg-white rounded-2xl shadow p-4 py-8'; card.innerHTML = `<div class="flex items-start justify-between gap-4"><div><h3 class="font-semibold">${t.title}</h3><p class="mt-2 text-sm text-gray-600">${t.description||'No description'}</p><div class="mt-3 text-xs inline-flex items-center gap-2 py-1 px-6 rounded-full ${t.status==='open'? 'bg-green-500': t.status==='closed'? 'bg-gray-600':'bg-orange-500'}"><span class="capitalize text-white whitespace-nowrap">${t.status.replace('_',' ')}</span></div></div><div class="flex flex-col gap-2"><button data-id="${t.id}" class="edit-btn text-sm px-3 py-1 rounded bg-indigo-50">Edit</button><button data-id="${t.id}" class="del-btn text-sm px-3 py-1 rounded bg-red-50 text-red-600">Delete</button></div></div>`; grid.appendChild(card); }); document.querySelectorAll('.del-btn').forEach(b=>b.addEventListener('click', async (e)=>{ const id=e.currentTarget.dataset.id; if(!confirm('Delete ticket?')) return; try{ await (await import('./public/js/ticketService.js')).deleteTicket(id); showToast('Deleted'); load(); }catch(err){ showToast('Delete failed','error'); } })); }catch(e){ showToast('Failed to load tickets. Please retry.','error'); } } load();</script>
+  <footer class="mt-auto bg-white border-t">
+  <div class="container-centered px-6 py-6 text-sm text-gray-600 w-[90%] md:w-4/5 max-w-[1440px] mx-auto">
+    © 2025 TicketApp. All rights reserved.
+  </div>
+</footer>
+</body>
+</html>

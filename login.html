@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./public/css/index.css">
+</head>
+<body class="min-h-screen flex flex-col bg-gray-50 text-gray-900">
+  <header class="bg-white shadow-sm ">
+  <div class="px-6 py-4 flex items-center justify-between max-w-[1440px] mx-auto">
+    <div class="flex items-center gap-4">
+      <a href="./index.html" class="text-xl font-semibold">TicketApp</a>
+    </div>
+    <nav class="flex items-center gap-4 text-sm">
+      <a href="./dashboard.html" class="nav-dashboard hidden">Dashboard</a>
+      <a href="./tickets.html" class="nav-tickets hidden">Tickets</a>
+      <a href="./login.html" class="nav-login">Login</a>
+      <a href="./signup.html" class="nav-signup px-4 py-1 bg-indigo-600 text-white rounded-md">Get Started</a>
+      <button id="nav-logout" class="nav-logout hidden text-sm px-3 py-1 rounded-md bg-red-50 text-red-600">Logout</button>
+    </nav>
+  </div>
+  <script type="module">
+    import { getSession, logout } from './public/js/authService.js';
+    const session = getSession();
+    const show = (sel)=> document.querySelectorAll(sel).forEach(e=>e.classList.remove('hidden'));
+    const hide = (sel)=> document.querySelectorAll(sel).forEach(e=>e.classList.add('hidden'));
+    if(session){
+      show('.nav-dashboard'); show('.nav-tickets');
+      hide('.nav-login'); hide('.nav-signup');
+      document.getElementById('nav-logout').classList.remove('hidden');
+      document.getElementById('nav-logout').addEventListener('click', ()=>{ logout(); });
+    } else {
+      hide('.nav-dashboard'); hide('.nav-tickets'); hide('.nav-logout');
+      show('.nav-login'); show('.nav-signup');
+    }
+  </script>
+</header>  <div id="toast-root" class="fixed top-4 right-4 z-50 space-y-2">
+  </div>
+  <main class="container-centered px-6 py-12 w-[95%] md:w-4/5 max-w-[1440px] mx-auto">
+  <img src="./public/assets/success.png" class="hidden text-green-500 bg-white"/>
+
+  <div class="max-w-md mx-auto bg-white rounded-2xl shadow p-6">
+    <h2 class="text-2xl font-semibold">Login</h2>
+    <form id="login-form" class="mt-4 space-y-4" novalidate>
+      <div>
+        <label class="block text-sm">Email</label>
+        <input id="email" type="email" class="w-full mt-1 p-2 border rounded" required />
+        <p id="err-email" class="text-xs text-red-600 mt-1 hidden"></p>
+      </div>
+      <div>
+        <label class="block text-sm">Password</label>
+        <input id="password" type="password" class="w-full mt-1 p-2 border rounded" required />
+        <p id="err-password" class="text-xs text-red-600 mt-1 hidden"></p>
+      </div>
+      <div class="flex items-center justify-between">
+        <button id="login-btn" class="px-4 py-2 bg-indigo-600 text-white rounded">Login</button>
+        <a class="text-sm text-indigo-600" href="./signup.html">Sign up</a>
+      </div>
+    </form>
+    <div class="mt-4 text-sm text-gray-500">Test user: <strong>test@example.com</strong> / <strong>Password123</strong></div>
+  </div>
+</main>
+<script type="module">
+import { login } from './public/js/authService.js';
+import { showToast } from './public/js/toast.js';
+const form = document.getElementById('login-form');
+form.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  let errs = {};
+  if(!email) errs.email = 'Email is required.';
+  if(!password) errs.password = 'Password is required.';
+  document.getElementById('err-email').classList.toggle('hidden', !errs.email);
+  document.getElementById('err-password').classList.toggle('hidden', !errs.password);
+  if(errs.email) document.getElementById('err-email').textContent = errs.email;
+  if(errs.password) document.getElementById('err-password').textContent = errs.password;
+  if(Object.keys(errs).length) return;
+  try{ await login({email, password}); showToast('Logged in', 'success'); window.location.href = '/dashboard.html'; }catch(err){ showToast('Invalid credentials','error'); }
+});
+</script>
+  <footer class="mt-auto bg-white border-t">
+  <div class="container-centered px-6 py-6 text-sm text-gray-600 w-[90%] md:w-4/5 max-w-[1440px] mx-auto">
+    © 2025 TicketApp. All rights reserved.
+  </div>
+</footer>
+</body>
+</html>

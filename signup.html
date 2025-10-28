@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Signup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./public/css/index.css">
+</head>
+<body class="min-h-screen flex flex-col bg-gray-50 text-gray-900">
+  <header class="bg-white shadow-sm ">
+  <div class="px-6 py-4 flex items-center justify-between max-w-[1440px] mx-auto">
+    <div class="flex items-center gap-4">
+      <a href="./index.html" class="text-xl font-semibold">TicketApp</a>
+    </div>
+    <nav class="flex items-center gap-4 text-sm">
+      <a href="./dashboard.html" class="nav-dashboard hidden">Dashboard</a>
+      <a href="./tickets.html" class="nav-tickets hidden">Tickets</a>
+      <a href="./login.html" class="nav-login">Login</a>
+      <a href="./signup.html" class="nav-signup px-4 py-1 bg-indigo-600 text-white rounded-md">Get Started</a>
+      <button id="nav-logout" class="nav-logout hidden text-sm px-3 py-1 rounded-md bg-red-50 text-red-600">Logout</button>
+    </nav>
+  </div>
+  <script type="module">
+    import { getSession, logout } from './public/js/authService.js';
+    const session = getSession();
+    const show = (sel)=> document.querySelectorAll(sel).forEach(e=>e.classList.remove('hidden'));
+    const hide = (sel)=> document.querySelectorAll(sel).forEach(e=>e.classList.add('hidden'));
+    if(session){
+      show('.nav-dashboard'); show('.nav-tickets');
+      hide('.nav-login'); hide('.nav-signup');
+      document.getElementById('nav-logout').classList.remove('hidden');
+      document.getElementById('nav-logout').addEventListener('click', ()=>{ logout(); });
+    } else {
+      hide('.nav-dashboard'); hide('.nav-tickets'); hide('.nav-logout');
+      show('.nav-login'); show('.nav-signup');
+    }
+  </script>
+</header>  <div id="toast-root" class="fixed top-4 right-4 z-50 space-y-2">
+  </div>
+  <main class=" px-6 py-12 w-[95%] md:w-4/5 max-w-[1440px] mx-auto">
+  <img src="./public/assets/success.png" class="hidden text-green-500 bg-white"/>
+
+  <div class="max-w-md mx-auto bg-white rounded-2xl shadow p-6">
+    <h2 class="text-2xl font-semibold mb-4">Create Account</h2>
+
+    <form id="signup-form" class="space-y-4" novalidate>
+      <div>
+        <label for="name" class="block text-sm font-medium">Name</label>
+        <input id="name" name="name" class="w-full mt-1 p-2 border rounded" required />
+        <p id="err-name" class="text-xs text-red-600 mt-1 hidden"></p>
+      </div>
+
+      <div>
+        <label for="email" class="block text-sm font-medium">Email</label>
+        <input id="email" name="email" type="email" class="w-full mt-1 p-2 border rounded" required />
+        <p id="err-email" class="text-xs text-red-600 mt-1 hidden"></p>
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium">Password</label>
+        <input id="password" name="password" type="password" class="w-full mt-1 p-2 border rounded" required minlength="8" />
+        <p id="err-password" class="text-xs text-red-600 mt-1 hidden"></p>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <button id="signup-btn" type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
+          Create Account
+        </button>
+        <a class="text-sm text-indigo-600 hover:underline" href="./login.html">Login</a>
+      </div>
+    </form>
+  </div>
+</main>
+
+<script type="module">
+import { signUp } from './public/js/authService.js';
+import { showToast } from './public/js/toast.js';
+
+const form = document.getElementById('signup-form');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+
+  const errs = {};
+  if (!name) errs.name = 'Name required';
+  if (!email) errs.email = 'Email required';
+  if (!password || password.length < 8) errs.password = 'Password must be at least 8 characters';
+
+  for (const field of ['name', 'email', 'password']) {
+    const errElem = document.getElementById('err-' + field);
+    if (errs[field]) {
+      errElem.textContent = errs[field];
+      errElem.classList.remove('hidden');
+    } else {
+      errElem.classList.add('hidden');
+    }
+  }
+
+  if (Object.keys(errs).length) return;
+
+  try {
+    await signUp({ email, password });
+
+    const raw = localStorage.getItem('ticketapp_session');
+    if (raw) {
+      const session = JSON.parse(raw);
+      session.user.name = name;
+      localStorage.setItem('ticketapp_session', JSON.stringify(session));
+    }
+
+    showToast('Account created successfully');
+    window.location.href = '/dashboard.html';
+  } catch (error) {
+    console.error(error);
+    showToast('Failed to sign up', 'error');
+  }
+});
+</script>
+  <footer class="mt-auto bg-white border-t">
+  <div class="container-centered px-6 py-6 text-sm text-gray-600 w-[90%] md:w-4/5 max-w-[1440px] mx-auto">
+    © 2025 TicketApp. All rights reserved.
+  </div>
+</footer>
+</body>
+</html>

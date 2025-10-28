@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>TicketApp - Twig </title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./public/css/index.css">
+</head>
+<body class="min-h-screen flex flex-col bg-gray-50 text-gray-900">
+  <header class="bg-white shadow-sm ">
+  <div class="px-6 py-4 flex items-center justify-between max-w-[1440px] mx-auto">
+    <div class="flex items-center gap-4">
+      <a href="./index.html" class="text-xl font-semibold">TicketApp</a>
+    </div>
+    <nav class="flex items-center gap-4 text-sm">
+      <a href="./dashboard.html" class="nav-dashboard hidden">Dashboard</a>
+      <a href="./tickets.html" class="nav-tickets hidden">Tickets</a>
+      <a href="./login.html" class="nav-login">Login</a>
+      <a href="./signup.html" class="nav-signup px-4 py-1 bg-indigo-600 text-white rounded-md">Get Started</a>
+      <button id="nav-logout" class="nav-logout hidden text-sm px-3 py-1 rounded-md bg-red-50 text-red-600">Logout</button>
+    </nav>
+  </div>
+  <script type="module">
+    import { getSession, logout } from './public/js/authService.js';
+    const session = getSession();
+    const show = (sel)=> document.querySelectorAll(sel).forEach(e=>e.classList.remove('hidden'));
+    const hide = (sel)=> document.querySelectorAll(sel).forEach(e=>e.classList.add('hidden'));
+    if(session){
+      show('.nav-dashboard'); show('.nav-tickets');
+      hide('.nav-login'); hide('.nav-signup');
+      document.getElementById('nav-logout').classList.remove('hidden');
+      document.getElementById('nav-logout').addEventListener('click', ()=>{ logout(); });
+    } else {
+      hide('.nav-dashboard'); hide('.nav-tickets'); hide('.nav-logout');
+      show('.nav-login'); show('.nav-signup');
+    }
+  </script>
+</header>  <div id="toast-root" class="fixed top-4 right-4 z-50 space-y-2">
+  </div>
+  
+<main class="container-centered px-6 pt-12 pb-8">
+  <img src="./public/assets/success.png" class="hidden text-green-500 bg-white"/>
+
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden mt-8 bg-gradient-to-b from-indigo-50 to-white rounded-2xl max-w-[1440px] mx-auto w-[95%] md:w-4/5 ">
+    <div class="pl-4 md:pl-8 pr-4 pt-10 md:pt-24">
+      <h1 class="text-4xl font-extrabold">
+        TicketApp — Multi-framework Ticket Manager
+      </h1>
+      <p class="mt-4 text-lg text-gray-700">
+        Build, manage and track tickets with a clean, consistent UI.<br />
+        Implementations: React, Vue, Twig.
+      </p>
+      <div class="mt-6 flex gap-4">
+        <a href="./signup.html" class="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition">
+          Get Started
+        </a>
+        <a href="./login.html" class="px-4 py-2 rounded-md border hover:bg-gray-100 transition">
+          Login
+        </a>
+      </div>
+    </div>
+
+    <div class="absolute -right-20 -bottom-12 w-56 h-56 rounded-full opacity-30 bg-indigo-300"></div>
+    <div class="mt-4">
+      <img src="./public/assets/hero-wave.svg" alt="wave." class="w-full block" />
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-12 max-w-[1440px] mx-auto w-[95%] md:w-4/5 ">
+    <article class="bg-white p-6 rounded-2xl shadow hover:shadow-md transition">
+      <img src="./public/assets/unified.png" alt="Dashboard" class="w-12 h-12 mb-3">
+      <h3 class="text-lg font-semibold mb-2">Unified Dashboard</h3>
+      <p class="text-gray-600 text-sm">
+        Track, manage, and analyze all your tickets in one intuitive, easy-to-navigate interface.
+      </p>
+    </article>
+
+    <article class="bg-white p-6 rounded-2xl shadow hover:shadow-md transition">
+      <img src="./public/assets/secure.jpg" alt="Security" class="w-12 h-auto mb-3">
+      <h3 class="text-lg font-semibold mb-2">Secure & Reliable</h3>
+      <p class="text-gray-600 text-sm">
+        Your data is safe with built-in encryption, session validation, and seamless authentication.
+      </p>
+    </article>
+
+    <article class="bg-white p-6 rounded-2xl shadow hover:shadow-md transition">
+      <img src="./public/assets/customizable.png" alt="Customizable" class="w-12 h-12 mb-3">
+      <h3 class="text-lg font-semibold mb-2">Customizable Workflow</h3>
+      <p class="text-gray-600 text-sm">
+        Adapt TicketApp to your team's process — tweak forms, priorities, and statuses easily.
+      </p>
+    </article>
+  </section>
+</main>
+
+
+
+
+</div>   <footer class="mt-auto bg-white border-t">
+  <div class="container-centered px-6 py-6 text-sm text-gray-600 w-[90%] md:w-4/5 max-w-[1440px] mx-auto">
+    © 2025 TicketApp. All rights reserved.
+  </div>
+</footer>
+</body>
+</html>
