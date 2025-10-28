@@ -24,6 +24,6 @@ export async function signUp({ email, password}) {
     // const err = new Error("account created successfully");
     return session;
 }
-export function logout(){ localStorage.removeItem(SESSION_KEY); window.location.href = '/'; }
+export function logout(){ localStorage.removeItem(SESSION_KEY); window.location.href = './'; }
 export function getSession(){ const raw = localStorage.getItem(SESSION_KEY); if(!raw) return null; try{ return JSON.parse(raw);}catch(e){return null;} }
 export function requireAuthOrRedirect(){ if(!getSession()){ window.location.href = '/login.html'; return false;} return true; }
