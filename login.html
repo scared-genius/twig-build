@@ -78,7 +78,7 @@ form.addEventListener('submit', async (e)=>{
   if(errs.email) document.getElementById('err-email').textContent = errs.email;
   if(errs.password) document.getElementById('err-password').textContent = errs.password;
   if(Object.keys(errs).length) return;
-  try{ await login({email, password}); showToast('Logged in', 'success'); window.location.href = '/dashboard.html'; }catch(err){ showToast('Invalid credentials','error'); }
+  try{ await login({email, password}); showToast('Logged in', 'success'); window.location.href = './dashboard.html'; }catch(err){ showToast('Invalid credentials','error'); }
 });
 </script>
   <footer class="mt-auto bg-white border-t">
